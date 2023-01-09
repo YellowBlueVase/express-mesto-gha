@@ -9,7 +9,11 @@ const cardSchema = new mongoose.Schema({
   },
   link: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: 'Некорректный URL',
+    }
   },
   owner: {
     type: Array,
@@ -17,7 +21,7 @@ const cardSchema = new mongoose.Schema({
   },
   likes: {
     type: Array,
-    default: []
+    default: [],
   },
   createdAt: {
     type: Date,
