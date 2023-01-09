@@ -33,7 +33,7 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -45,7 +45,7 @@ module.exports.updateProfile = (req, res) => {
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -57,6 +57,6 @@ module.exports.updateAvatar = (req, res) => {
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении аватара.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении аватара.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };

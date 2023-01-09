@@ -25,9 +25,7 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); }
-      if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
-      if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'ValidationError') { res.status(ERROR_CODE_400).send(err); } else if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании карточки.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -48,9 +46,7 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' }); }
-      if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' }); }
-      if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'Bad request') { res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' }); } else if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' }); } else if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -63,8 +59,6 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' }); }
-      if (err.name === 'Not Found') { return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' }); }
-      if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'Bad request') { res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные для постановки/снятии лайка.' }); } else if (err.name === 'Not Found') { res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' }); } else if (err.name === 'Internal Server Error') { res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); } else { return `${err.name} : ${err.message} `; }
     });
 };
