@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+
+function validator(v) {
+  return v;
+}
+
 // Опишем схему:
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,10 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => validator.isURL(v),
+      validator: (value) => validator.isURL(value),
       message: 'Некорректный URL',
-    }
-  }
+    },
+  },
 });
 
 // создаём модель и экспортируем её
