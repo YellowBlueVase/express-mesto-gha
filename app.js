@@ -19,7 +19,6 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
 app.use((req, res, next) => {
   req.user = {
     _id: '63bb0c6ad0dfa81824b22ac7', // вставьте сюда _id созданного в предыдущем пункте пользователя
@@ -31,6 +30,4 @@ app.use('/', routerUsers);
 app.use('/', routerCards);
 
 app.listen(PORT, () => {
-  // Если всё работает, консоль покажет, какой порт приложение слушает
-  console.log(`App listening on KKKK port ${PORT}`);
 });
