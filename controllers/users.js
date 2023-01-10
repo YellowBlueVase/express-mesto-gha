@@ -8,26 +8,32 @@ const ERROR_CODE_404 = 404;
 // Internal Server Error
 const ERROR_CODE_500 = 500;
 
-const opts = { runValidators: true };
+const opts = {
+  new: true,
+  runValidators: true,
+};
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      if (err.name === 'Bad request') { return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' }); }
-      if (err.name === 'Internal Server Error') { return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' }); }
+      if (err.name === 'Bad request') {
+        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      } else if (err.name === 'Internal Server Error') {
+        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
+      } else { return `${err.name} : ${err.message} `; }
     });
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params.userId)
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'Not Found') {
         res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден.' });
       } else if (err.name === 'Internal Server Error') {
         return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      }
+      } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -49,9 +55,10 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.updateProfile = (req, res) => {
+  const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.params.userId,
-    { new: true },
+    req.user._id,
+    { name, about },
     opts,
   )
     .then((user) => res.send({ data: user }))

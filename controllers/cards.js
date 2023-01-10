@@ -9,7 +9,10 @@ const ERROR_CODE_404 = 404;
 // Internal Server Error
 const ERROR_CODE_500 = 500;
 
-const opts = { runValidators: true };
+const opts = {
+  new: true,
+  runValidators: true,
+};
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -19,7 +22,7 @@ module.exports.getCards = (req, res) => {
         res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании карточки.' });
       } else if (err.name === 'Internal Server Error') {
         return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      }
+      } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -43,8 +46,8 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'Not Found') {
-        return res.status(ERROR_CODE_404).send({ message: 'Карточка с указанным _id не найдена.' });
-      }
+        res.status(ERROR_CODE_404).send({ message: 'Карточка с указанным _id не найдена.' });
+      } else { return `${err.name} : ${err.message} `; }
     });
 };
 
@@ -52,7 +55,6 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
     opts,
   )
     .then((card) => res.send({ data: card }))
@@ -71,7 +73,6 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
     opts,
   )
     .then((card) => res.send({ data: card }))
