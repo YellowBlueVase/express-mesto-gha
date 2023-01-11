@@ -28,6 +28,6 @@ router.patch('/users/me/avatar', celebrate(celebrateUser), auth, updateAvatar);
 
 router.post('/signin', celebrate(celebrateUser), login);
 
-router.post('/signup', createUser);
+router.post('/signup', celebrate(celebrateUser), createUser);
 
 module.exports = router;
