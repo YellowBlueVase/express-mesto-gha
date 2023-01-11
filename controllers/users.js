@@ -1,96 +1,109 @@
 /* eslint-disable consistent-return */
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 
 // Bad request
-const ERROR_CODE_400 = 400;
+const ERROR_CODE_400 = require('../middlewares/error400');
 // Not Found
-const ERROR_CODE_404 = 404;
-// Internal Server Error
-const ERROR_CODE_500 = 500;
+const ERROR_CODE_404 = require('../middlewares/error404');
 
 const opts = {
   new: true,
   runValidators: true,
 };
 
-module.exports.getAllUsers = (req, res) => {
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_400('Переданы некорректные данные при создании пользователя.');
+      }
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(next);
+};
+
+module.exports.getAllUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      if (err.name === 'Bad request') {
-        res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      } else if (err.name === 'Internal Server Error') {
-        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      } else { return `${err.name} : ${err.message} `; }
-    });
+    .then((users) => {
+      if (!users) {
+        throw new ERROR_CODE_400('Переданы некорректные данные при создании пользователя.');
+      }
+      res.send({ data: users });
+    })
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'Not Found') {
-        res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден.' });
-      } else if (err.name === 'Internal Server Error') {
-        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      } else { return `${err.name} : ${err.message} `; }
-    });
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send(err);
-      } else if (err.name === 'Bad request') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      } else if (err.name === 'Not Found') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.name === 'Internal Server Error') {
-        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      } else { return `${err.name} : ${err.message} `; }
-    });
+module.exports.getProfile = (req, res, next) => {
+  User.findById(req.params.me)
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.createUser = (req, res, next) => {
+  bcrypt.hash(req.body.password, 12)
+    .then((hash) => User.create({
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
+      email: req.body.email,
+      password: hash,
+    }))
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
+};
+
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    req.params.me,
     { name, about },
     opts,
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send(err);
-      } else if (err.name === 'Bad request') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      } else if (err.name === 'Not Found') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.name === 'Internal Server Error') {
-        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      } else { return `${err.name} : ${err.message} `; }
-    });
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.params.userId,
     { new: true },
     opts,
   )
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE_400).send(err);
-      } else if (err.name === 'Bad request') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
-      } else if (err.name === 'Not Found') {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь с указанным _id не найден.' });
-      } else if (err.name === 'Internal Server Error') {
-        return res.status(ERROR_CODE_500).send({ message: 'Ошибка по умолчанию.' });
-      } else { return `${err.name} : ${err.message} `; }
-    });
+    .then((user) => {
+      if (!user) {
+        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+      }
+      res.send({ data: user });
+    })
+    .catch(next);
 };

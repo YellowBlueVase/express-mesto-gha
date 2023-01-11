@@ -1,41 +1,41 @@
 const mongoose = require('mongoose');
-
-const validator = {
-  isURL(value) {
-    const pattern = new RegExp(
-      '^([a-zA-Z]+:\\/\\/)?' // protocol
-        + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
-        + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR IP (v4) address
-        + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
-        + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
-        + '(\\#[-a-z\\d_]*)?$', // fragment locator
-      'i',
-    );
-    return pattern.test(value);
-  },
-};
+const validator = require('validator');
 
 // Опишем схему:
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    default: 'Жак-Ив Кусто',
     minlength: 2,
     maxlength: 30,
   },
   about: {
     type: String,
-    required: true,
+    default: 'Исследователь',
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     type: String,
-    required: true,
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     validate: {
       validator: (value) => validator.isURL(value),
       message: 'Некорректный URL',
     },
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    validate: {
+      validator: (value) => validator.isEmail(value),
+      message: 'Некорректный Email',
+    },
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false,
   },
 });
 
