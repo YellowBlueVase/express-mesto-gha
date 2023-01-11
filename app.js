@@ -1,12 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 const auth = require('./middlewares/auth');
-
-// подключаемся к серверу mongo
 
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -24,7 +23,8 @@ app.use(cookieParser());
 app.use('/', routerUsers);
 app.use(auth);
 app.use('/', routerCards);
-app.use((err, req, res) => {
+app.use(errors());
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
@@ -34,6 +34,8 @@ app.use((err, req, res) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+
+  next();
 });
 
 app.listen(PORT, () => {
