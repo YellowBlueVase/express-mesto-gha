@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const ERROR_CODE_401 = require('../middlewares/error401');
 
 // Опишем схему:
 const userSchema = new mongoose.Schema({
@@ -45,12 +46,12 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }) // this — это модель User
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        throw new ERROR_CODE_401('Неправильные почта или пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            throw new ERROR_CODE_401('Неправильные почта или пароль');
           }
           return user;
         });
