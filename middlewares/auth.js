@@ -26,12 +26,9 @@ module.exports = (req, res, next) => {
   const token = authorization.replace('Bearer ', '');
   let payload;
 
-  console.log(jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'));
-
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    console.log("попали в ошибку пэйлоада")
     throw new ERROR_CODE_401('Необходима авторизация');
   }
 
