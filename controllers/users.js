@@ -7,11 +7,11 @@ const ERROR_CODE_400 = require('../middlewares/error400');
 // Not Found
 const ERROR_CODE_404 = require('../middlewares/error404');
 
-const { NODE_ENV, JWT_SECRET } = process.env;
 const opts = {
   new: true,
   runValidators: true,
 };
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
