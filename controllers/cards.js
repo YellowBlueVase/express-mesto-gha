@@ -18,13 +18,19 @@ module.exports.getCards = (req, res, next) => {
       if (!cards) {
         throw new ERROR_CODE_400('Переданы некорректные данные при создании карточки.');
       }
+      console.log(Card)
+      console.log(req)
+      console.log(res)
       res.send({ data: cards });
     })
-    .catch(next);
+    .catch((err) => {
+      console.log(err.message + err.name)
+    });
 };
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
+  console.log(req)
   Card.create({ name, link })
     .then((card) => {
       if (!card) {
@@ -36,6 +42,7 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
+  console.log(req.params.id)
   Card.findByIdAndRemove(req.params.id)
     .then((card) => {
       if (!card) {

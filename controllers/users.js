@@ -1,13 +1,13 @@
-/* eslint-disable consistent-return */
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
-
 // Bad request
 const ERROR_CODE_400 = require('../middlewares/error400');
 // Not Found
 const ERROR_CODE_404 = require('../middlewares/error404');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
 const opts = {
   new: true,
   runValidators: true,
@@ -17,10 +17,7 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new ERROR_CODE_400('Переданы некорректные данные при создании пользователя.');
-      }
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.send({ token });
     })
     .catch(next);

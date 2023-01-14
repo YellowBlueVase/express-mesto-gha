@@ -2,6 +2,18 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
+//   const token = req.cookie;
+//   if (!token) {
+//     next;
+//     return;
+//   }
+//   let payload;
+//   try {
+//     payload = jwt.verify(token, 'some-secret-key');
+//   }
+//   catch (next)
+// }
+
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
