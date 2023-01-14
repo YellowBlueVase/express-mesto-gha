@@ -1,5 +1,9 @@
 /* eslint-disable consistent-return */
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const ERROR_CODE_401 = require('./error401');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
 //   const token = req.cookie;
@@ -15,22 +19,20 @@ module.exports = (req, res, next) => {
 // }
 
   const { authorization } = req.headers;
-
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    throw new ERROR_CODE_401('Необходима авторизация');
   }
 
   const token = authorization.replace('Bearer ', '');
   let payload;
 
+  console.log(jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'));
+
   try {
-    payload = jwt.verify(token, 'some-secret-key');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+    console.log("попали в ошибку пэйлоада")
+    throw new ERROR_CODE_401('Необходима авторизация');
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса

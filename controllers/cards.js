@@ -25,7 +25,8 @@ module.exports.getCards = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  Card.create({ name, link })
+  const owner = req.user._id;
+  Card.create({ name, link, owner })
     .then((card) => {
       if (!card) {
         throw new ERROR_CODE_400('Переданы некорректные данные при создании карточки.');
@@ -36,14 +37,18 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => {
-      if (!card) {
-        throw new ERROR_CODE_404('Карточка с указанным _id не найдена.');
-      }
-      res.send({ data: card });
-    })
-    .catch(next);
+  if (req.params.owner === req.user._id) {
+    Card.findByIdAndRemove(req.params.id)
+      .then((card) => {
+        if (!card) {
+          throw new ERROR_CODE_404('Карточка с указанным _id не найдена.');
+        }
+        res.send({ data: card });
+      })
+      .catch(next);
+  }
+
+  throw new ERROR_CODE_400('Вы не можете удалять карточки, созданные другими пользователями');
 };
 
 module.exports.likeCard = (req, res, next) => {
