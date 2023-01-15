@@ -43,7 +43,7 @@ module.exports.getUser = (req, res, next) => {
     .catch(() => { throw new ERROR_CODE_404('Пользователь по указанному _id не найден.'); })
     .then((user) => {
       if (!user) {
-        throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
+        throw new ERROR_CODE_400('Пользователь по указанному _id не найден.');
       }
       res.send({ data: user });
     })
