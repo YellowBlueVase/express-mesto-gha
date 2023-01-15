@@ -7,6 +7,8 @@ const User = require('../models/users');
 const ERROR_CODE_400 = require('../errors/error400');
 // Not Found
 const ERROR_CODE_404 = require('../errors/error404');
+// Conflict
+const ERROR_CODE_409 = require('../errors/error409');
 
 const opts = {
   new: true,
@@ -68,6 +70,9 @@ module.exports.createUser = (req, res, next) => {
       email: req.body.email,
       password: hash,
     }))
+    .catch(() => {
+      throw new ERROR_CODE_409('Пользователь с таким email адресом уже зарегистрирован');
+    })
     .then((user) => {
       if (!user) {
         throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
