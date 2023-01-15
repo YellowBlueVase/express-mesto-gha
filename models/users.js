@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-const ERROR_CODE_401 = require('../middlewares/error401');
+const ERROR_CODE_401 = require('../errors/error401');
 
 // Опишем схему:
 const userSchema = new mongoose.Schema({
@@ -38,7 +38,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    select: false,
   },
 });
 

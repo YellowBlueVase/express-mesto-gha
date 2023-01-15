@@ -3,9 +3,11 @@
 const Card = require('../models/cards');
 
 // Bad request
-const ERROR_CODE_400 = require('../middlewares/error400');
+const ERROR_CODE_400 = require('../errors/error400');
+// Forbidden
+const ERROR_CODE_403 = require('../errors/error403');
 // Not Found
-const ERROR_CODE_404 = require('../middlewares/error404');
+const ERROR_CODE_404 = require('../errors/error404');
 
 const opts = {
   new: true,
@@ -38,7 +40,7 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   if (req.params.owner === req.user._id) {
-    Card.findByIdAndRemove(req.params.id)
+    Card.findByIdAndRemove(req.params._id)
       .then((card) => {
         if (!card) {
           throw new ERROR_CODE_404('Карточка с указанным _id не найдена.');
@@ -74,7 +76,7 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new ERROR_CODE_400('Переданы некорректные данные при создании карточки.');
+        throw new ERROR_CODE_403('Переданы некорректные данные при создании карточки.');
       }
       res.send({ data: card });
     })

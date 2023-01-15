@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
 // const limiter = require('./middlewares/limiter');
-const centralError = require('./middlewares/centralError');
+const centralError = require('./errors/centralError');
 
 mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://localhost:27017/mestodb', {

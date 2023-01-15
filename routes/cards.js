@@ -14,19 +14,19 @@ const celebrateUser = {
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().regex(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
+    email: Joi.string().email(),
+    password: Joi.string(),
   }).unknown(true),
 };
 
 router.get('/cards', getCards);
 
-router.post('/cards', celebrate(celebrateUser), auth, createCard);
+router.post('/cards', auth, createCard);
 
-router.delete('/cards/:cardId', celebrate(celebrateUser), auth, deleteCard);
+router.delete('/cards/:cardId', auth, deleteCard);
 
-router.put('/cards/:cardId/likes', celebrate(celebrateUser), auth, likeCard);
+router.put('/cards/:cardId/likes', auth, celebrate(celebrateUser), likeCard);
 
-router.delete('/cards/:cardId/likes', celebrate(celebrateUser), auth, dislikeCard);
+router.delete('/cards/:cardId/likes', auth, celebrate(celebrateUser), dislikeCard);
 
 module.exports = router;

@@ -4,9 +4,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
 // Bad request
-const ERROR_CODE_400 = require('../middlewares/error400');
+const ERROR_CODE_400 = require('../errors/error400');
 // Not Found
-const ERROR_CODE_404 = require('../middlewares/error404');
+const ERROR_CODE_404 = require('../errors/error404');
 
 const opts = {
   new: true,
@@ -19,6 +19,7 @@ module.exports.login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+
       res.send({ token });
     })
     .catch(next);
@@ -37,6 +38,7 @@ module.exports.getAllUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
+    .catch(() => { throw new ERROR_CODE_404('Пользователь по указанному _id не найден.'); })
     .then((user) => {
       if (!user) {
         throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
@@ -58,7 +60,7 @@ module.exports.getProfile = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  bcrypt.hash(req.body.password, 12)
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
       about: req.body.about,
@@ -70,7 +72,16 @@ module.exports.createUser = (req, res, next) => {
       if (!user) {
         throw new ERROR_CODE_404('Пользователь по указанному _id не найден.');
       }
-      res.send({ data: user });
+      res.send({
+        data: {
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+          _id: user._id,
+          __v: user.__v,
+        },
+      });
     })
     .catch(next);
 };
