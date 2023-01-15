@@ -21,9 +21,9 @@ const celebrateUser = {
 
 router.get('/cards', getCards);
 
-router.post('/cards', auth, createCard);
+router.post('/cards', auth, celebrate(celebrateUser), createCard);
 
-router.delete('/cards/:cardId', auth, deleteCard);
+router.delete('/cards/:cardId', auth, celebrate(celebrateUser), deleteCard);
 
 router.put('/cards/:cardId/likes', auth, celebrate(celebrateUser), likeCard);
 
