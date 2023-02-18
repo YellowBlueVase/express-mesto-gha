@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
 const Card = require('../models/cards');
+const User = require('../models/users');
 
 // Bad request
 const ERROR_CODE_400 = require('../errors/error400');
@@ -27,9 +28,13 @@ module.exports.getCards = (req, res, next) => {
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
+  const owner = { _id: req.user._id };
+  console.log(owner)
+  console.log(name)
+  console.log(req.body)
   Card.create({ name, link, owner })
     .then((card) => {
+      console.log(card)
       if (!card) {
         throw new ERROR_CODE_400('Переданы некорректные данные при создании карточки.');
       }
@@ -39,16 +44,26 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  if (req.params.owner === req.user._id) {
-    Card.findByIdAndRemove(req.params._id)
-      .then((card) => {
-        if (!card) {
-          throw new ERROR_CODE_404('Карточка с указанным _id не найдена.');
-        }
-        res.send({ data: card });
-      })
-      .catch(next);
-  }
+//   // User.findById(req.params.owner)
+//   //   .then((user) => {
+//   //     console.log(user)
+//   //     // if (!user) {
+//   //     //   throw new ERROR_CODE_400('Вы не можете удалять карточки, созданные другими пользователями');
+//   //     // }
+//   //     res.send({ data: user });
+//   //   })
+//   //   .catch(next);
+//   console.log(req.params.owner)
+//   if (req.params.owner === req.user._id) {
+//     Card.findByIdAndRemove(req.params._id)
+//       .then((card) => {
+//         if (!card) {
+//           throw new ERROR_CODE_404('Карточка с указанным _id не найдена.');
+//         }
+//         res.send({ data: card });
+//       })
+//       .catch(next);
+//   }
 
   throw new ERROR_CODE_400('Вы не можете удалять карточки, созданные другими пользователями');
 };
